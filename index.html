@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" id="appHtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wasl Academy - زاد المسلم</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #f7f9f6;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .islamic-pattern {
+            background-image: radial-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 0), radial-gradient(rgba(197, 160, 89, 0.05) 1px, transparent 0);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fce8b2 0%, #c5a059 40%, #aa8238 70%, #f4dfa2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-metallic-bg {
+            background: linear-gradient(135deg, #fce8b2 0%, #d4af37 30%, #c5a059 70%, #aa8238 100%);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+        .pulse-btn:active { transform: scale(0.94); }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #c5a059; border-radius: 10px; }
+        html[dir="ltr"] .input-icon { right: auto; left: 0; padding-left: 14px; }
+        html[dir="ltr"] .input-field { padding-right: 12px; padding-left: 40px; }
+        html[dir="rtl"] .input-icon { left: auto; right: 0; padding-right: 14px; }
+        html[dir="rtl"] .input-field { padding-left: 12px; padding-right: 40px; }
+
+        /* ===== AZKAR OVERLAY STYLES ===== */
+        .azkar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 9999;
+            padding: 0;
+        }
+        .azkar-sheet {
+            background: #fff;
+            width: 100%;
+            max-width: 430px;
+            max-height: 92vh;
+            border-radius: 22px 22px 0 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            font-family: 'Cairo', sans-serif;
+            animation: slideUp .3s ease;
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to   { transform: translateY(0); }
+        }
+        .sheet-header {
+            background: #1c1917;
+            color: #f4dfa2;
+            padding: 14px 16px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .sheet-header h2 { margin: 0; font-size: 15px; font-weight: 700; }
+        .sheet-close {
+            background: none; border: none; color: #a8a29e;
+            font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
+        }
+        .progress-bar-wrap { background: #e7e5e4; height: 5px; flex-shrink: 0; }
+        .progress-bar-fill {
+            height: 5px;
+            background: linear-gradient(90deg, #c5a059, #f4dfa2);
+            transition: width .35s ease;
+        }
+        .azkar-scroll-list { overflow-y: auto; flex: 1; padding: 12px 12px 6px; }
+        .zikr-card {
+            background: #fafaf9;
+            border: 1.5px solid #e7e5e4;
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: border-color .3s, background .3s;
+        }
+        .zikr-card.done {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+        .zikr-text {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1c1917;
+            text-align: right;
+            line-height: 1.85;
+            margin: 0 0 6px;
+            white-space: pre-line;
+        }
+        .zikr-repeat {
+            font-size: 11px;
+            color: #78716c;
+            margin: 0 0 10px;
+            text-align: right;
+        }
+        .zikr-counter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .zikr-dots {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        .dot {
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            border: 2px solid #c5a059;
+            background: #fff;
+            cursor: pointer;
+            transition: background .2s, transform .1s;
+            flex-shrink: 0;
+        }
+        .dot.filled { background: #c5a059; border-color: #c5a059; }
+        .dot:active { transform: scale(.88); }
+        .zikr-tap-btn {
+            background: #1c1917;
+            color: #f4dfa2;
+            border: none;
+            border-radius: 10px;
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background .2s, transform .1s;
+            white-space: nowrap;
+        }
+        .zikr-tap-btn:active { transform: scale(.93); }
+        .zikr-tap-btn.done-btn { background: #16a34a; color: #fff; pointer-events: none; }
+        .sheet-done-footer {
+            background: #16a34a;
+            color: #fff;
+            text-align: center;
+            padding: 13px;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: 'Cairo', sans-serif;
+            flex-shrink: 0;
+            display: none;
+        }
+        /* ===== END AZKAR OVERLAY STYLES ===== */
+    </style>
+</head>
+<body class="islamic-pattern min-h-screen flex justify-center items-center p-0 sm:p-4">
+
+    <!-- ===== AZKAR OVERLAY ===== -->
+    <div id="azkar-overlay" class="azkar-overlay" style="display:none" onclick="handleOverlayClick(event)">
+        <div class="azkar-sheet">
+            <div class="sheet-header">
+                <h2 id="sheet-title">أذكار الصباح</h2>
+                <button class="sheet-close" onclick="closeAzkarSheet()">✕</button>
+            </div>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="azkar-prog-bar" style="width:0%"></div>
+            </div>
+            <div class="azkar-scroll-list" id="azkar-list-container"></div>
+            <div class="sheet-done-footer" id="azkar-done-footer">✅ تم بحمد الله — أتممت الأذكار كاملة</div>
+        </div>
+    </div>
+    <!-- ===== END AZKAR OVERLAY ===== -->
+
+    <!-- Mobile Screen Container -->
+    <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] sm:rounded-3xl sm:shadow-2xl overflow-hidden flex flex-col relative border border-stone-200/60">
+        
+        <!-- Status Bar -->
+        <div class="bg-stone-900 text-stone-300 text-xs px-5 pt-3 pb-1 flex justify-between items-center font-sans select-none z-50">
+            <div id="liveClock">00:00 🕋</div>
+            <div class="flex items-center gap-3">
+                <button onclick="toggleLanguage()" class="bg-stone-800 hover:bg-stone-700 text-[#f4dfa2] font-bold px-2.5 py-0.5 rounded border border-stone-700/50 flex items-center gap-1 cursor-pointer transition-all">
+                    <i class="fas fa-globe text-[10px]"></i>
+                    <span id="langBtnText">English</span>
+                </button>
+                <div class="flex items-center gap-1.5">
+                    <i class="fas fa-wifi"></i>
+                    <i class="fas fa-signal"></i>
+                    <i class="fas fa-battery-three-quarters"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- App Header -->
+        <header id="appHeader" class="bg-stone-900 text-white px-5 py-3 flex justify-between items-center shadow-md border-b border-stone-800 hidden">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-white overflow-hidden flex justify-center items-center p-0.5 shadow-sm">
+                    <img src="https://i.ibb.co/LznKmbNb/IMG-1737.jpg" alt="Wasl Academy" class="w-full h-full object-contain rounded-full">
+                </div>
+                <div>
+                    <h1 class="text-xs font-black tracking-wide font-sans gold-gradient-text">Wasl Academy</h1>
+                    <p class="text-[11px] text-stone-400 font-medium" id="appTitleText" data-ar="زاد المسلم - الذاكر الرقمي" data-en="Zad Al-Muslim App">زاد المسلم - الذاكر الرقمي</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="dayIndicator" class="text-[11px] bg-stone-800 text-amber-300 border border-stone-700 px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <i class="fas fa-calendar-day text-[10px]"></i>
+                    <span id="dayText">التاريخ</span>
+                </span>
+                <button onclick="logout()" class="w-8 h-8 rounded-lg bg-stone-800 hover:bg-rose-950/40 hover:text-rose-400 text-stone-400 flex justify-center items-center transition-all cursor-pointer">
+                    <i class="fas fa-sign-out-alt text-xs"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 overflow-y-auto flex flex-col pb-24 bg-stone-50/40">
+            
+            <!-- 1. WELCOME SCREEN -->
+            <section id="screenAuth" class="flex-1 flex flex-col justify-between px-6 py-6">
+                <div></div>
+                <div class="w-full">
+                    <div class="text-center mb-4 relative select-none flex flex-col items-center">
+                        <div class="w-32 h-32 mb-3 flex justify-center items-center overflow-hidden rounded-full bg-white shadow-md p-1 border-2 border-stone-100">
+                            <img src="https://i.ibb.co/LznKmbNb/IMG-1737.jpg" alt="Wasl Academy Logo" class="w-full h-full object-contain rounded-full">
+                        </div>
+                        <h2 class="text-2xl font-black text-stone-900 tracking-tight" id="giftTitle" data-ar="أكاديمية وَصْل" data-en="Wasl Academy">أكاديمية وَصْل</h2>
+                        <p class="text-amber-600 text-sm font-bold mt-1" id="giftPromo" data-ar="🎁 تقدم لكم هدية خاصة 🎁" data-en="🎁 Presents a Special Gift 🎁">🎁 تقدم لكم هدية خاصة 🎁</p>
+                        <p class="text-stone-500 text-xs font-semibold mt-2 max-w-[290px] leading-relaxed" id="giftSubtitle" data-ar="يسعدنا أن نهديكم تطبيق زاد المسلم الرقمي ليكون صدقة جارية لنا ولكم" data-en="We are pleased to gift you Zad Al-Muslim app to be a running charity for us and you">يسعدنا أن نهديكم تطبيق زاد المسلم الرقمي ليكون صدقة جارية لنا ولكم</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-stone-200/80 p-5 shadow-sm text-center space-y-4">
+                        <div class="w-11 h-11 rounded-full bg-amber-50 flex items-center justify-center text-amber-600 mx-auto">
+                            <i class="fas fa-gift text-lg"></i>
+                        </div>
+                        <button onclick="login()" class="w-full pulse-btn gold-metallic-bg text-stone-900 font-black py-3.5 rounded-xl text-sm shadow-md transition-all active:scale-95 cursor-pointer tracking-wide flex items-center justify-center gap-2" id="btnEnterApp" data-ar="اضغط هنا 🕋" data-en="Click Here 🕋">
+                            اضغط هنا 🕋
+                        </button>
+                    </div>
+
+                    <button onclick="shareAppText()" class="mt-4 w-full py-3 bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold rounded-xl border border-amber-200/60 flex items-center justify-center gap-2 cursor-pointer transition-all shadow-sm">
+                        <i class="fas fa-share-alt animate-bounce"></i> 
+                        <span id="btnShareLabel" data-ar="مشاركة التطبيق ونشر الثواب 🔄" data-en="Share App for Spiritual Rewards 🔄">مشاركة التطبيق ونشر الثواب 🔄</span>
+                    </button>
+                </div>
+
+                <div class="border-t border-stone-200/80 pt-4 mt-6">
+                    <p class="text-center text-[11px] text-stone-500 font-bold mb-3" id="followUsText" data-ar="يسعدنا متابعتكم وتواصلكم معنا" data-en="We are pleased with your follow-up and communication with us">يسعدنا متابعتكم وتواصلكم معنا</p>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <a href="https://wasl-academy-b28en59.gamma.site/" target="_blank" class="flex flex-col items-center justify-center gap-1 p-2 bg-stone-50 hover:bg-amber-50/50 rounded-xl border border-stone-200/60 transition-all group">
+                            <i class="fas fa-globe text-amber-600 text-sm group-hover:scale-110 transition-transform"></i> 
+                            <span class="text-[10px] font-bold text-stone-600" id="btnLinkSite" data-ar="الموقع الرسمي" data-en="Official Site">الموقع الرسمي</span>
+                        </a>
+                        <a href="https://wa.me/966539214377" target="_blank" class="flex flex-col items-center justify-center gap-1 p-2 bg-stone-50 hover:bg-emerald-50/50 rounded-xl border border-stone-200/60 transition-all group">
+                            <i class="fab fa-whatsapp text-emerald-600 text-sm group-hover:scale-110 transition-transform"></i> 
+                            <span class="text-[10px] font-bold text-stone-600" id="btnLinkWhatsapp" data-ar="الواتساب" data-en="WhatsApp">الواتساب</span>
+                        </a>
+                        <a href="https://waslacademy.taplink.bio" target="_blank" class="flex flex-col items-center justify-center gap-1 p-2 bg-stone-50 hover:bg-rose-50/50 rounded-xl border border-stone-200/60 transition-all group">
+                            <i class="fas fa-layer-group text-rose-600 text-sm group-hover:scale-110 transition-transform"></i> 
+                            <span class="text-[10px] font-bold text-stone-600" id="btnLinkPlatforms" data-ar="تابعنا هنا" data-en="All Platforms">تابعنا هنا</span>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. PAGE 1: TASBIH & AZKAR SCREEN -->
+            <section id="screenTracker" class="p-4 space-y-4 hidden">
+
+                <!-- AUTOMATIC FRIDAY FEATURE -->
+                <div id="fridayCard" class="bg-gradient-to-r from-stone-800 to-stone-900 rounded-2xl p-4 text-white shadow-md border border-stone-700 hidden">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="bg-amber-500/20 text-amber-300 border border-amber-400/30 text-[10px] px-2 py-0.5 rounded-md font-bold" id="badgeFriday" data-ar="سُنّة يوم الجمعة المباركة 🕋" data-en="Friday Sunnah Actions 🕋">سُنّة يوم الجمعة المباركة 🕋</span>
+                    </div>
+                    <h3 class="text-xs font-bold text-stone-200 mb-2" id="fridayQuote" data-ar="سورة الكهف كاملة بتلاوة خاشعة" data-en="Surah Al-Kahf Recitation">سورة الكهف كاملة بتلاوة خاشعة</h3>
+                    <div class="w-full rounded-xl overflow-hidden bg-black/40 aspect-video">
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/SgIatwFNoN8" title="Quran recitation" frameborder="0" allowfullscreen></iframe>
+                    </div>
+                </div>
+
+                <!-- DAILY WISDOM BAR -->
+                <div class="bg-amber-50 border border-amber-200/60 rounded-xl p-3 text-center">
+                    <p id="wisdomText" class="text-[11px] font-bold text-amber-900 transition-all"></p>
+                </div>
+
+                <!-- DIGITAL TASBIH -->
+                <div class="bg-white rounded-2xl p-5 border border-stone-200/60 shadow-sm text-center">
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="flex items-center gap-2 text-stone-800">
+                            <i class="fas fa-circle-notch text-amber-600 animate-spin" style="animation-duration: 8s;"></i>
+                            <h3 class="font-bold text-xs" id="titleTasbih" data-ar="العداد الذكي المطوّر" data-en="Smart Advanced Counter">العداد الذكي المطوّر</h3>
+                        </div>
+                        <select id="tasbihType" class="text-[10px] bg-stone-50 border border-stone-200 rounded-lg px-2 py-1 focus:outline-none font-bold text-stone-600">
+                            <option value="سبحان الله">سبحان الله / Subhan Allah</option>
+                            <option value="الحمد لله">الحمد لله / Alhamdulillah</option>
+                            <option value="الله أكبر">الله أكبر / Allahu Akbar</option>
+                            <option value="لا إله إلا الله">لا إله إلا الله / La ilaha illa Allah</option>
+                            <option value="لا حول ولا قوة إلا بالله">لا حول ولا قوة إلا بالله / La Hawla wa la Quwwata illa billah</option>
+                        </select>
+                    </div>
+
+                    <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-stone-100 border border-stone-200 text-stone-700 text-[10px] font-bold mb-3">
+                        <i class="fas fa-medal text-amber-600"></i> <span id="userLevelDisplay"></span>
+                    </div>
+
+                    <div class="w-full max-w-[260px] mx-auto bg-stone-900 rounded-xl p-4 flex flex-col items-center justify-center border-4 border-stone-800 shadow-inner select-none">
+                        <span class="text-[9px] uppercase tracking-wider text-stone-500 font-bold mb-0.5" id="lblTotalTaps" data-ar="إجمالي النقر" data-en="Total Taps">إجمالي النقر</span>
+                        <span id="tasbihCounterDisplay" class="text-5xl font-mono font-black text-amber-400 tracking-widest">0000</span>
+                        <button onclick="resetCurrentTasbih()" class="bg-stone-800 hover:bg-stone-700 px-3 py-0.5 text-stone-400 rounded-md text-[9px] mt-2 flex items-center gap-1 transition-all border border-stone-700/50 cursor-pointer">
+                            <i class="fas fa-undo text-[8px] text-amber-500"></i> <span id="lblReset" data-ar="تصفير العداد" data-en="Reset Counter">تصفير العداد</span>
+                        </button>
+                    </div>
+
+                    <div class="mt-6 flex flex-col items-center justify-center">
+                        <button onclick="incrementTasbih()" class="pulse-btn w-28 h-28 bg-stone-900 hover:bg-stone-800 text-[#f4dfa2] rounded-full shadow-xl border-4 border-stone-800 flex flex-col items-center justify-center transition-all cursor-pointer group active:scale-90">
+                            <i class="fas fa-fingerprint text-3xl mb-1 group-hover:scale-110 transition-transform"></i>
+                            <span class="text-[10px] font-bold tracking-tight" id="btnTap" data-ar="انقر للعد" data-en="Tap to Count">انقر للعد</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- DAILY AZKAR -->
+                <div class="bg-white rounded-2xl p-4 border border-stone-200/60 shadow-sm">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i class="fas fa-check-circle text-amber-600"></i>
+                        <h3 class="font-bold text-xs text-stone-800" id="titleAzkar" data-ar="الورد اليومي للأذكار" data-en="Daily Azkar Progress">الورد اليومي للأذكار</h3>
+                    </div>
+                    <div class="space-y-2">
+                        <!-- Sabah Row -->
+                        <div class="flex justify-between items-center p-3 bg-stone-50 border border-stone-100 rounded-xl" id="sabahRow">
+                            <div>
+                                <h4 class="text-xs font-bold text-stone-700" id="txtSabahTitle" data-ar="أذكار الصباح" data-en="Morning Azkar">أذكار الصباح</h4>
+                                <p class="text-[10px] text-stone-400 font-medium" id="sabahStatusText">لم يتم الإتمام اليوم</p>
+                            </div>
+                            <button id="btnAzkarSabah" onclick="openAzkarSheet('sabah')" class="px-4 py-1.5 bg-white border border-stone-200 text-[10px] font-bold text-stone-700 rounded-lg cursor-pointer transition-all">إتمام الذكر</button>
+                        </div>
+                        <!-- Masaa Row -->
+                        <div class="flex justify-between items-center p-3 bg-stone-50 border border-stone-100 rounded-xl" id="masaaRow">
+                            <div>
+                                <h4 class="text-xs font-bold text-stone-700" id="txtMasaaTitle" data-ar="أذكار المساء" data-en="Evening Azkar">أذكار المساء</h4>
+                                <p class="text-[10px] text-stone-400 font-medium" id="masaaStatusText">لم يتم الإتمام اليوم</p>
+                            </div>
+                            <button id="btnAzkarMasaa" onclick="openAzkarSheet('masaa')" class="px-4 py-1.5 bg-white border border-stone-200 text-[10px] font-bold text-stone-700 rounded-lg cursor-pointer transition-all">إتمام الذكر</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. PAGE 2: SALAWAT SCREEN -->
+            <section id="screenSalawat" class="p-4 space-y-4 hidden flex-1 flex flex-col justify-center">
+                <div class="bg-white rounded-3xl p-6 border border-stone-200/70 shadow-sm text-center flex-1 flex flex-col justify-between max-w-sm mx-auto w-full my-auto">
+                    <div>
+                        <div class="w-12 h-12 mx-auto rounded-full bg-amber-50 flex items-center justify-center text-amber-600 mb-2">
+                            <i class="fas fa-heart text-lg"></i>
+                        </div>
+                        <h2 class="text-base font-black text-stone-800" id="titleSalawat" data-ar="بوابة الصلاة على النبي ﷺ" data-en="Salawat Portal ﷺ">بوابة الصلاة على النبي ﷺ</h2>
+                        <p class="text-[11px] text-stone-400 max-w-[240px] mx-auto mt-1" id="salawatDesc" data-ar="عطّر أنفاسك بالصلاة والسلام على رسول الله" data-en="Bless your day by sending peace upon Prophet Muhammad">عطّر أنفاسك بالصلاة والسلام على رسول الله</p>
+                    </div>
+
+                    <div class="my-4 p-5 bg-gradient-to-b from-stone-50 to-stone-100/50 rounded-2xl border border-stone-200/40 relative">
+                        <div class="text-[10px] font-bold uppercase tracking-widest text-stone-400" id="lblTotalSalawat" data-ar="مجموع الصلوات الحالي" data-en="Current Salawat Total">مجموع الصلوات الحالي</div>
+                        <div id="salawatCounterDisplay" class="text-5xl font-mono font-black text-stone-900 my-2 tracking-widest">0000</div>
+                        <button onclick="resetSalawatCount()" class="text-[10px] text-stone-400 hover:text-rose-600 font-bold border border-stone-200 bg-white rounded-md px-2 py-0.5 transition-colors inline-flex items-center gap-1 mx-auto mt-1 cursor-pointer">
+                            <i class="fas fa-trash-alt text-[9px]"></i> <span id="lblClear" data-ar="تصفير عداد الصلاة" data-en="Reset Counter">تصفير عداد الصلاة</span>
+                        </button>
+                    </div>
+
+                    <div>
+                        <button onclick="incrementSalawat()" class="w-full pulse-btn bg-stone-900 hover:bg-stone-800 text-[#f4dfa2] font-bold py-4 px-4 rounded-2xl shadow-lg border border-stone-900 text-xs tracking-wide cursor-pointer flex flex-col items-center justify-center gap-1">
+                            <span class="text-sm font-black" id="btnSalawatText" data-ar="اللهم صلِّ وسلّم على نبينا محمد" data-en="Allahumma Salli Wa Sallim Alaa Muhammad">اللهم صلِّ وسلّم على نبينا محمد</span>
+                            <span class="text-[9px] text-stone-400 font-normal" id="btnSalawatSub" data-ar="(اضغط هنا لزيادة العداد بمقدار ١)" data-en="(Tap here to count +1)">(اضغط هنا لزيادة العداد بمقدار ١)</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- BOTTOM NAV -->
+        <nav id="appNav" class="absolute bottom-0 inset-x-0 bg-white border-t border-stone-200/80 h-16 flex items-center justify-around hidden z-40">
+            <button onclick="switchTab('tracker')" id="navTabTracker" class="flex flex-col items-center justify-center flex-1 h-full text-stone-800 font-bold cursor-pointer">
+                <i class="fas fa-dhikr text-lg mb-0.5"></i><span class="text-[10px]" id="navT1" data-ar="التسبيح والأذكار" data-en="Tasbih & Azkar">التسبيح والأذكار</span>
+            </button>
+            <button onclick="switchTab('salawat')" id="navTabSalawat" class="flex flex-col items-center justify-center flex-1 h-full text-stone-400 font-bold cursor-pointer">
+                <i class="fas fa-heart text-lg mb-0.5"></i><span class="text-[10px]" id="navT2" data-ar="الصلاة على النبي" data-en="Salawat Portal">الصلاة على النبي</span>
+            </button>
+        </nav>
+
+        <!-- Toast -->
+        <div id="toastNotification" class="absolute top-16 left-1/2 -translate-x-1/2 bg-stone-900 text-amber-300 px-4 py-2.5 rounded-xl text-xs font-bold border border-stone-700/50 shadow-2xl flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300 z-50">
+            <i class="fas fa-check-circle text-emerald-500"></i>
+            <span id="toastText">تم النسخ بنجاح!</span>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================================
+           APP STATE
+        ============================================================ */
+        let appState = {
+            isLoggedIn: false,
+            currentLang: 'ar',
+            counters: { tasbih: 0, salawat: 0, sabahDone: false, masaaDone: false }
+        };
+
+        const wisdomQuotes = {
+            ar: "قال ﷺ: 'كلمتان خفيفتان على اللسان، ثقيلتان في الميزان: سبحان الله وبحمده سبحان الله العظيم'.",
+            en: "The Prophet ﷺ said: 'Two words are light on the tongue, heavy in the balance: Subhan Allah wa bihamdihi, Subhan Allah al-Azeem'."
+        };
+
+        /* ============================================================
+           AZKAR DATA
+        ============================================================ */
+        const azkarData = {
+            sabah: {
+                title: { ar: "أذكار الصباح", en: "Morning Azkar" },
+                list: [
+                    {
+                        text: "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\n\nاللّهُ لاَ إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ\n\n﴿ آية الكرسي — البقرة: ٢٥٥ ﴾",
+                        repeat: 1
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\n\n﴿ سورة الإخلاص ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\n\n﴿ سورة الفلق ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَـهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ\n\n﴿ سورة الناس ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.\n\nرَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ.\n\nرَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ.\n\nرَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ\n\n﴿ سيد الاستغفار ﴾",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ.\n\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
+                        repeat: 3
+                    },
+                    {
+                        text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ.\n\nاللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي.\n\nاللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي.\n\nاللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+                        repeat: 1
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+                        repeat: 3
+                    },
+                    {
+                        text: "رَضِيتُ بِاللهِ رَبّاً، وَبِالإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ ﷺ نَبِيّاً",
+                        repeat: 3
+                    },
+                    {
+                        text: "يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلاَ تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
+                        repeat: 1
+                    },
+                    {
+                        text: "أَصْبَحْنَا عَلَى فِطْرَةِ الإِسْلاَمِ، وَعَلَى كَلِمَةِ الإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+                        repeat: 1
+                    },
+                    {
+                        text: "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+                        repeat: 100
+                    },
+                    {
+                        text: "حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+                        repeat: 7
+                    },
+                    {
+                        text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+                        repeat: 10
+                    },
+                    {
+                        text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+                        repeat: 10
+                    }
+                ]
+            },
+            masaa: {
+                title: { ar: "أذكار المساء", en: "Evening Azkar" },
+                list: [
+                    {
+                        text: "أَعُوذُ بِاللهِ مِنَ الشَّيْطَانِ الرَّجِيمِ\n\nاللّهُ لاَ إِلَـهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ، لاَ تَأْخُذُهُ سِنَةٌ وَلاَ نَوْمٌ، لَّهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الأَرْضِ، مَن ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلاَّ بِإِذْنِهِ، يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ، وَلاَ يُحِيطُونَ بِشَيْءٍ مِّنْ عِلْمِهِ إِلاَّ بِمَا شَاءَ، وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالأَرْضَ، وَلاَ يَؤُودُهُ حِفْظُهُمَا، وَهُوَ الْعَلِيُّ الْعَظِيمُ\n\n﴿ آية الكرسي — البقرة: ٢٥٥ ﴾",
+                        repeat: 1
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ ۝ لَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ\n\n﴿ سورة الإخلاص ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ ۝ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ۝ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ۝ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ\n\n﴿ سورة الفلق ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الرَّحْمَنِ الرَّحِيمِ\n\nقُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَـهِ النَّاسِ ۝ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ۝ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ۝ مِنَ الْجِنَّةِ وَالنَّاسِ\n\n﴿ سورة الناس ﴾",
+                        repeat: 3
+                    },
+                    {
+                        text: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ.\n\nرَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ وَشَرِّ مَا بَعْدَهَا.\n\nرَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ.\n\nرَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ أَنْتَ رَبِّي لاَ إِلَهَ إِلاَّ أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لاَ يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ\n\n﴿ سيد الاستغفار ﴾",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لاَ إِلَهَ إِلاَّ أَنْتَ.\n\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ، وَالْفَقْرِ، وَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لاَ إِلَهَ إِلاَّ أَنْتَ",
+                        repeat: 3
+                    },
+                    {
+                        text: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ.\n\nاللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي.\n\nاللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي.\n\nاللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ، وَمِنْ خَلْفِي، وَعَنْ يَمِينِي، وَعَنْ شِمَالِي، وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لاَ إِلَهَ إِلاَّ أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءاً، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ",
+                        repeat: 1
+                    },
+                    {
+                        text: "بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
+                        repeat: 3
+                    },
+                    {
+                        text: "رَضِيتُ بِاللهِ رَبّاً، وَبِالإِسْلاَمِ دِيناً، وَبِمُحَمَّدٍ ﷺ نَبِيّاً",
+                        repeat: 3
+                    },
+                    {
+                        text: "أَمْسَيْنَا عَلَى فِطْرَةِ الإِسْلاَمِ، وَعَلَى كَلِمَةِ الإِخْلاَصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفاً مُسْلِماً وَمَا كَانَ مِنَ الْمُشْرِكِينَ",
+                        repeat: 1
+                    },
+                    {
+                        text: "اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ.\n\nاللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ وَأُشْهِدُ حَمَلَةَ عَرْشِكَ وَمَلاَئِكَتَكَ وَجَمِيعَ خَلْقِكَ أَنَّكَ أَنْتَ اللَّهُ لاَ إِلَهَ إِلاَّ أَنْتَ وَحْدَكَ لاَ شَرِيكَ لَكَ، وَأَنَّ مُحَمَّداً عَبْدُكَ وَرَسُولُكَ",
+                        repeat: 1
+                    },
+                    {
+                        text: "سُبْحَانَ اللهِ وَبِحَمْدِهِ",
+                        repeat: 100
+                    },
+                    {
+                        text: "حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
+                        repeat: 7
+                    },
+                    {
+                        text: "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+                        repeat: 10
+                    },
+                    {
+                        text: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+                        repeat: 10
+                    }
+                ]
+            }
+        };
+
+        /* ============================================================
+           AZKAR SHEET LOGIC
+        ============================================================ */
+        let currentAzkarType = null;
+        let azkarCounters = [];
+
+        function openAzkarSheet(type) {
+            currentAzkarType = type;
+            const lang = appState.currentLang;
+            const data = azkarData[type];
+            azkarCounters = data.list.map(() => 0);
+            document.getElementById('sheet-title').textContent = data.title[lang];
+            document.getElementById('azkar-done-footer').style.display = 'none';
+            renderAzkarList();
+            updateAzkarProgress();
+            document.getElementById('azkar-overlay').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAzkarSheet() {
+            document.getElementById('azkar-overlay').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        function handleOverlayClick(e) {
+            if (e.target === document.getElementById('azkar-overlay')) closeAzkarSheet();
+        }
+
+        function renderAzkarList() {
+            const data = azkarData[currentAzkarType];
+            const container = document.getElementById('azkar-list-container');
+            container.innerHTML = '';
+
+            data.list.forEach((z, i) => {
+                const done = azkarCounters[i] >= z.repeat;
+                const card = document.createElement('div');
+                card.className = 'zikr-card' + (done ? ' done' : '');
+                card.id = 'zcard-' + i;
+
+                const showDots = z.repeat <= 20;
+                let dotsHTML = '';
+                if (showDots) {
+                    for (let d = 0; d < z.repeat; d++) {
+                        dotsHTML += `<div class="dot${d < azkarCounters[i] ? ' filled' : ''}" onclick="tapZikr(${i})"></div>`;
+                    }
+                }
+
+                const btnClass = done ? 'zikr-tap-btn done-btn' : 'zikr-tap-btn';
+                const btnLabel = done
+                    ? (appState.currentLang === 'ar' ? '✓ تم' : '✓ Done')
+                    : `${azkarCounters[i]}/${z.repeat} — ${appState.currentLang === 'ar' ? 'اضغط' : 'Tap'}`;
+
+                card.innerHTML = `
+                    <p class="zikr-text" dir="rtl">${z.text.replace(/\n/g, '<br>')}</p>
+                    <p class="zikr-repeat" dir="rtl">${appState.currentLang === 'ar' ? 'التكرار:' : 'Repeat:'} ${z.repeat} ${z.repeat === 1 ? (appState.currentLang === 'ar' ? 'مرة' : 'time') : (appState.currentLang === 'ar' ? 'مرات' : 'times')}</p>
+                    <div class="zikr-counter-row">
+                        <button class="${btnClass}" id="zbtn-${i}" onclick="tapZikr(${i})">${btnLabel}</button>
+                        <div class="zikr-dots">${dotsHTML}</div>
+                    </div>`;
+                container.appendChild(card);
+            });
+        }
+
+        function tapZikr(i) {
+            const data = azkarData[currentAzkarType];
+            if (azkarCounters[i] >= data.list[i].repeat) return;
+            azkarCounters[i]++;
+            const z = data.list[i];
+            const done = azkarCounters[i] >= z.repeat;
+            const lang = appState.currentLang;
+
+            const card = document.getElementById('zcard-' + i);
+            card.className = 'zikr-card' + (done ? ' done' : '');
+
+            const btn = document.getElementById('zbtn-' + i);
+            btn.className = done ? 'zikr-tap-btn done-btn' : 'zikr-tap-btn';
+            btn.textContent = done
+                ? (lang === 'ar' ? '✓ تم' : '✓ Done')
+                : `${azkarCounters[i]}/${z.repeat} — ${lang === 'ar' ? 'اضغط' : 'Tap'}`;
+
+            if (z.repeat <= 20) {
+                const dots = card.querySelectorAll('.dot');
+                dots.forEach((d, idx) => {
+                    d.className = 'dot' + (idx < azkarCounters[i] ? ' filled' : '');
+                });
+            }
+
+            updateAzkarProgress();
+        }
+
+        function updateAzkarProgress() {
+            const data = azkarData[currentAzkarType];
+            const total = data.list.length;
+            const doneCount = azkarCounters.filter((c, i) => c >= data.list[i].repeat).length;
+            const pct = Math.round((doneCount / total) * 100);
+            document.getElementById('azkar-prog-bar').style.width = pct + '%';
+
+            if (doneCount === total) {
+                document.getElementById('azkar-done-footer').style.display = 'block';
+                const container = document.getElementById('azkar-list-container');
+                setTimeout(() => { container.scrollTop = container.scrollHeight; }, 100);
+
+                // Mark done in appState and update main UI
+                if (currentAzkarType === 'sabah') appState.counters.sabahDone = true;
+                else appState.counters.masaaDone = true;
+                updateUI();
+            }
+        }
+
+        /* ============================================================
+           ORIGINAL APP LOGIC (unchanged)
+        ============================================================ */
+        function checkRealDateAndDay() {
+            const today = new Date();
+            const isFriday = (today.getDay() === 5);
+            document.getElementById('fridayCard').classList.toggle('hidden', !isFriday);
+            const lang = appState.currentLang;
+            if (isFriday) {
+                document.getElementById('dayText').innerText = lang === 'ar' ? "الجمعة المباركة 🕌" : "Blessed Friday 🕌";
+            } else {
+                const options = { month: 'short', day: 'numeric' };
+                document.getElementById('dayText').innerText = today.toLocaleDateString(lang === 'ar' ? 'ar-EG' : 'en-US', options);
+            }
+            document.getElementById('liveClock').innerText = today.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + " 🕋";
+        }
+        setInterval(checkRealDateAndDay, 1000);
+
+        function toggleLanguage() {
+            appState.currentLang = appState.currentLang === 'ar' ? 'en' : 'ar';
+            const htmlEl = document.getElementById('appHtml');
+            if (appState.currentLang === 'en') {
+                htmlEl.setAttribute('dir', 'ltr'); htmlEl.setAttribute('lang', 'en');
+                document.getElementById('langBtnText').innerText = 'العربية';
+            } else {
+                htmlEl.setAttribute('dir', 'rtl'); htmlEl.setAttribute('lang', 'ar');
+                document.getElementById('langBtnText').innerText = 'English';
+            }
+            updateUI(); checkRealDateAndDay();
+        }
+
+        function login()  { appState.isLoggedIn = true;  updateUI(); checkRealDateAndDay(); }
+        function logout() { appState.isLoggedIn = false; updateUI(); }
+
+        function switchTab(tabName) {
+            const tBtn = document.getElementById('navTabTracker');
+            const sBtn = document.getElementById('navTabSalawat');
+            if (tabName === 'tracker') {
+                tBtn.classList.add('text-stone-800'); tBtn.classList.remove('text-stone-400');
+                sBtn.classList.add('text-stone-400'); sBtn.classList.remove('text-stone-800');
+                document.getElementById('screenTracker').classList.remove('hidden');
+                document.getElementById('screenSalawat').classList.add('hidden');
+            } else {
+                sBtn.classList.add('text-stone-800'); sBtn.classList.remove('text-stone-400');
+                tBtn.classList.add('text-stone-400'); tBtn.classList.remove('text-stone-800');
+                document.getElementById('screenSalawat').classList.remove('hidden');
+                document.getElementById('screenTracker').classList.add('hidden');
+            }
+        }
+
+        function incrementTasbih()   { appState.counters.tasbih  += 1; updateUI(); }
+        function resetCurrentTasbih(){ appState.counters.tasbih   = 0; updateUI(); }
+        function incrementSalawat()  { appState.counters.salawat += 1; updateUI(); }
+        function resetSalawatCount() { appState.counters.salawat  = 0; updateUI(); }
+
+        function showToast(message) {
+            const toast = document.getElementById('toastNotification');
+            document.getElementById('toastText').innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function shareAppText() {
+            const textToCopy = "قال ﷺ: 'من دلّ على خير فله مثل أجر فاعله'. يسعدني أن أهديكم تطبيق (زاد المسلم الرقمي) المطور والمقدم كصدقة جارية من Wasl Academy لعدّ التسبيحات والأذكار اليومية والصلاة على النبي ﷺ. شاركنا الأجر وابدأ بالذكر الآن!";
+            const tempInput = document.createElement("textarea");
+            tempInput.value = textToCopy;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            const msg = appState.currentLang === 'ar'
+                ? "تم نسخ رسالة نشر الثواب بنجاح! يمكنك الآن إرسالها للجميع وجني الحسنات."
+                : "Remembrance sharing message copied successfully! You can send it now.";
+            showToast(msg);
+        }
+
+        function updateUI() {
+            const lang = appState.currentLang;
+
+            document.querySelectorAll('[data-ar]').forEach(el => {
+                el.innerText = el.getAttribute(`data-${lang}`);
+            });
+
+            document.getElementById('wisdomText').innerText = wisdomQuotes[lang];
+
+            if (!appState.isLoggedIn) {
+                document.getElementById('screenAuth').classList.remove('hidden');
+                document.getElementById('screenTracker').classList.add('hidden');
+                document.getElementById('screenSalawat').classList.add('hidden');
+                document.getElementById('appHeader').classList.add('hidden');
+                document.getElementById('appNav').classList.add('hidden');
+                return;
+            }
+
+            document.getElementById('screenAuth').classList.add('hidden');
+            document.getElementById('appHeader').classList.remove('hidden');
+            document.getElementById('appNav').classList.remove('hidden');
+            if (document.getElementById('screenSalawat').classList.contains('hidden')) {
+                document.getElementById('screenTracker').classList.remove('hidden');
+            }
+
+            document.getElementById('tasbihCounterDisplay').innerText  = String(appState.counters.tasbih).padStart(4,  '0');
+            document.getElementById('salawatCounterDisplay').innerText = String(appState.counters.salawat).padStart(4, '0');
+
+            const totalScore = appState.counters.tasbih + appState.counters.salawat;
+            let currentLevel = lang === 'ar' ? "بستان الاستغفار" : "Forgiveness Garden";
+            if (totalScore >= 30)  currentLevel = lang === 'ar' ? "الذاكر المثابر المُنيب"      : "Persistent Devoted Servant";
+            if (totalScore >= 100) currentLevel = lang === 'ar' ? "درجة صفوة الذاكرين ✨"       : "Elite Remembrance Tier ✨";
+            document.getElementById('userLevelDisplay').innerText = lang === 'ar'
+                ? `مستوى الذكر: ${currentLevel}`
+                : `Remembrance Level: ${currentLevel}`;
+
+            // --- Sabah button & status ---
+            const sDone = appState.counters.sabahDone;
+            const sabahBtn = document.getElementById('btnAzkarSabah');
+            sabahBtn.className = sDone
+                ? "px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-default"
+                : "px-4 py-1.5 bg-white border border-stone-200 text-[10px] font-bold text-stone-700 rounded-lg cursor-pointer transition-all";
+            sabahBtn.innerText = sDone
+                ? (lang === 'ar' ? "✓ تم بحمد الله" : "✓ Done")
+                : (lang === 'ar' ? "إتمام الذكر" : "Start Azkar");
+            sabahBtn.onclick = sDone ? null : () => openAzkarSheet('sabah');
+            document.getElementById('sabahStatusText').innerText = sDone
+                ? (lang === 'ar' ? "✅ تم بحمد الله" : "✅ Completed")
+                : (lang === 'ar' ? "لم يتم الإتمام اليوم" : "Incomplete today");
+            document.getElementById('sabahStatusText').className = sDone
+                ? "text-[10px] text-emerald-600 font-bold"
+                : "text-[10px] text-stone-400 font-medium";
+
+            // --- Masaa button & status ---
+            const mDone = appState.counters.masaaDone;
+            const masaaBtn = document.getElementById('btnAzkarMasaa');
+            masaaBtn.className = mDone
+                ? "px-4 py-1.5 bg-emerald-600 text-white rounded-lg text-[10px] font-bold cursor-default"
+                : "px-4 py-1.5 bg-white border border-stone-200 text-[10px] font-bold text-stone-700 rounded-lg cursor-pointer transition-all";
+            masaaBtn.innerText = mDone
+                ? (lang === 'ar' ? "✓ تم بحمد الله" : "✓ Done")
+                : (lang === 'ar' ? "إتمام الذكر" : "Start Azkar");
+            masaaBtn.onclick = mDone ? null : () => openAzkarSheet('masaa');
+            document.getElementById('masaaStatusText').innerText = mDone
+                ? (lang === 'ar' ? "✅ تم بحمد الله" : "✅ Completed")
+                : (lang === 'ar' ? "لم يتم الإتمام اليوم" : "Incomplete today");
+            document.getElementById('masaaStatusText').className = mDone
+                ? "text-[10px] text-emerald-600 font-bold"
+                : "text-[10px] text-stone-400 font-medium";
+        }
+
+        updateUI();
+    </script>
+</body>
+</html>
